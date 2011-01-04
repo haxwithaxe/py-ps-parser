@@ -73,7 +73,7 @@ def tokenize(input_file):
 							current_token = Token()
 						else:
 							current_token = Token(data_type="hex")
-							if (curren_token.isValid(character)):
+							if (current_token.isValid(character)):
 								current_token.append(character)
 					elif character == "[":
 						current_token = Token()
