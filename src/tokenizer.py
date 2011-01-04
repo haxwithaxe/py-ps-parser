@@ -70,15 +70,15 @@ def tokenize(input_file):
 						if (character == "<"):
 							token_list = token_list[:-1]
 							token_list.append(Token(name="<<", data_type="operator"))
-							current_token = Token(data_type="dictionary")
+							current_token = Token()
 						else:
 							current_token = Token(data_type="hex")
 							if (curren_token.isValid(character)):
 								current_token.append(character)
 					elif character == "[":
-						current_token = Token(data_type="array")
+						current_token = Token()
 					elif character == "{":
-						current_token = Token(data_type="procedure")
+						current_token = Token()
 		else:
 			current_token.append(character)
 		character = input_file.read(1)
