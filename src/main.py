@@ -8,7 +8,7 @@ import tokenizer
 def main():
 	tokens = tokenizer.tokenize(sys.stdin)
 	for token in tokens:
-		print "Token: >" + token.name + "<"
+		print "Token:" + token.data_type + ": >" + token.name + "<"
 	print ""
 	print "Number of tokens:", len(tokens)
 
