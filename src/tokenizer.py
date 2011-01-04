@@ -10,8 +10,6 @@ WHITE_SPACE = "\x00\t\x0a\x0c\x0d "
 class Token:
 	def __init__(self):
 		self.name = ""
-	def __init__(self, token_string):
-		self.name = token_string
 	def append(self, character):
 		self.name += character
 
@@ -23,13 +21,10 @@ def isSpecialCharacter(character):
 
 def tokenize(input_file):
 	token_list = []
-
-	if (type(input_file) != type(file)):
-		raise TypeError("Argument is not a file.")
-
 	inComment = False
 	current_token = Token()
-	while ((character = input_file.read(1)) != ''):
+	character = input_file.read(1)
+	while (character != ""):
 		if (isWhiteSpace(character) or isSpecialCharacter(character)):
 			if (len(current_token.name) > 0):
 				token_list.append(current_token)
@@ -37,7 +32,7 @@ def tokenize(input_file):
 		else:
 			if (not inComment):
 				current_token.append(character)
+		character = input_file.read(1)
 	if (len(current_token.name) > 0):
 		token_list.append(current_token)
-
 	return token_list

@@ -9,7 +9,7 @@ def main():
 	tokens = tokenizer.tokenize(sys.stdin)
 	print tokens
 	print ""
-	print "Number of tokens: " + len(tokens)
+	print "Number of tokens:", len(tokens)
 
 if __name__=="__main__":
 	main()
