@@ -53,7 +53,10 @@ def tokenize(input_file):
 		#if (isWhiteSpace(character) or isSpecialCharacter(character)):
 		if (not current_token.isValid(character)):
 			if ((len(current_token.name) > 0)
-					or (current_token.data_type == "string")):
+					or (current_token.data_type == "string")
+					or ((len(token_list) > 0)
+						and (token_list[-1].data_type == "operator")
+						and (token_list[-1].name == "/"))):
 				token_list.append(current_token)
 				current_token = Token()
 			if character == "%":
@@ -62,23 +65,25 @@ def tokenize(input_file):
 			else:
 				if (character in SPECIAL_CHARACTERS):
 					token_list.append(Token(name=character, data_type="operator"))
-				if character in BLOCK_START:
-					if character == "(":
-						current_token = Token(data_type="string")
-					elif character == "<":
+					if character in BLOCK_START:
+						if character == "(":
+							current_token = Token(data_type="string")
+						elif character == "<":
+							character = input_file.read(1)
+							if (character == "<"):
+								token_list = token_list[:-1]
+								token_list.append(Token(name="<<", data_type="operator"))
+								current_token = Token()
+							else:
+								current_token = Token(data_type="hex")
+								continue
+					if character == ">":
 						character = input_file.read(1)
-						if (character == "<"):
+						if character == ">":
 							token_list = token_list[:-1]
-							token_list.append(Token(name="<<", data_type="operator"))
-							current_token = Token()
+							token_list.append(Token(name=">>", data_type="operator"))
 						else:
-							current_token = Token(data_type="hex")
-							if (curren_token.isValid(character)):
-								current_token.append(character)
-					elif character == "[":
-						current_token = Token()
-					elif character == "{":
-						current_token = Token()
+							continue
 		else:
 			current_token.append(character)
 		character = input_file.read(1)
