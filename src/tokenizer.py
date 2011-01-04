@@ -50,7 +50,6 @@ def tokenize(input_file):
 	current_token = Token()
 	character = input_file.read(1)
 	while (character != ""):
-		#if (isWhiteSpace(character) or isSpecialCharacter(character)):
 		if (not current_token.isValid(character)):
 			if ((len(current_token.name) > 0)
 					or (current_token.data_type == "string")
