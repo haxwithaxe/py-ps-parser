@@ -38,7 +38,7 @@ def main():
 
 	psobj = t.ps_to_tree()
 
-	print_pstree(psobj, "")
+	print_pstree(psobj)
 
 if __name__=="__main__":
 	main()
