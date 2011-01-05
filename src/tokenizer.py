@@ -43,7 +43,89 @@ class Token:
 				return False
 			raise Exception("Invalid character: " + character)
 
+		if ((self.data_type == "base85") and (character == "~")):
+			return False
+
+		if (self.data_type == "operator"):
+			if (len(self.name) == 1):
+				if ((self.name == "<")
+						and ((character == "<")
+							or (character == "~"))):
+					return True
+				if ((self.name == ">")
+						and (character == ">")):
+					return True
+			return False
+
 		return not (character in (WHITE_SPACE + SPECIAL_CHARACTERS))
+
+class Tokenizer:
+	def __init__(self, instream):
+		self.instream = instream
+		self.mode = "name"
+		self.last_char = ""
+		self.last_token = None
+		self.depth = 0
+
+	def __iter__(self):
+		return self
+
+	def nextChar(self):
+		self.last_char = self.instream.read(1)
+		return self.last_char
+
+	def next(self):
+		if (self.mode == "EOF"):
+			raise StopIteration
+		if ((self.last_token != None)
+				and (self.last_token.data_type == "operator")
+				and (self.mode != "operator")):
+			if (self.last_token.name == "("):
+				self.mode = "string"
+			elif (self.last_token.name == "<"):
+				self.mode = "hex"
+			elif (self.last_token.name == "<~"):
+				self.mode = "base85"
+			else:
+				self.mode = "name"
+		current_token = Token(data_type=self.mode)
+		if (self.mode == "operator"):
+			current_token.append(self.last_char)
+			character = self.nextChar()
+		if (self.last_char == ""):
+			character = self.nextChar()
+		else:
+			character = self.last_char
+		self.mode = "name"
+		while (character != ""):
+			if (not current_token.isValid(character)):
+				if ((len(current_token.name) > 0)
+						or (current_token.data_type == "string")
+						or ((self.last_token != None)
+							and (self.last_token.data_type == "operator")
+							and (self.last_token.name == "/"))):
+					self.last_token = current_token
+					return current_token
+				if character == "%":
+					current_token.data_type = "comment"
+					while ((character != "") and not (character in NEWLINE)):
+						current_token.append(character)
+						character = self.nextChar()
+					return current_token
+				if (character in SPECIAL_CHARACTERS):
+					self.mode = "operator"
+					break
+				character = self.nextChar()
+				break
+			else:
+				current_token.append(character)
+			character = self.nextChar()
+		if (character == ""):
+			self.mode = "EOF"
+		if (len(current_token.name) > 0):
+			self.last_token = current_token
+			return current_token
+		return self.next()
 
 def tokenize(input_file):
 	token_list = []
