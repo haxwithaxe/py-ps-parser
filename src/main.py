@@ -5,12 +5,12 @@
 import sys, pprint
 import tokenizer, outputps
 
-def print_pstree(treeobj):
+def print_pstree(treeobj, indent):
 
 	for i in treeobj.children:
 
-		print(i.token.name)
-		print_pstree(i)
+		print(indent + i.token.name)
+		print_pstree(i, indent+"  ")
 
 def main():
 	tokens = tokenizer.Tokenizer(sys.stdin)
@@ -18,7 +18,7 @@ def main():
 
 	psobj = t.ps_to_tree()
 
-	print_pstree(psobj)
+	print_pstree(psobj, "")
 
 if __name__=="__main__":
 	main()
