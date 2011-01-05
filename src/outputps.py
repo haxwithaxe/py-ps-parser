@@ -4,7 +4,7 @@ import re
 
 OOPS = ('[','{','(','<')
 
-EOPS = {']':'[','}':'{',')':'(','>':'<'}
+EOPS = {'[':']','{':'}','(':')','<':'>'}
 
 OPLABEL = 'operator'
 
@@ -27,47 +27,45 @@ class pstree:
 
 		self.curr_node = psnode(None)
 
-		type(self.curr_node)
-
 		self.tokens = tokens
 
 	def _find_nodes(self):
 
 		tok = self.tokens.next()
 
-		if tok.name in OOPS and tok.data_type == OPLABEL:
+		for tok in self.tokens:
 
-			while tok.data_type != OPLABEL:
-
-				self.curr_node.children[-1].append([tok])
-
-				tok = self.tokens.next()			
+			print(tok.name)		
 
 			if tok.name in OOPS:
 
-				self.curr_node.children.append([psnode(tok,self.curr_node)])
+				self.curr_node.children.append(psnode(tok,self.curr_node))
 
 				self.curr_node = self.curr_node.children[-1]
 
 				self._find_nodes()
 
-			elif tok.name == EOPS[self.curr_node.token.name]:
+			elif self.curr_node.token and tok.name == EOPS[self.curr_node.token.name]:
 
-				self.curr_node.children[-1].append([tok])
+				self.curr_node.children.append(psnode(tok,self.curr_node))
 
 				self.curr_node = self.curr_node.parent
 
-				self._find_nodes(items,curr_node)
+				self._find_nodes()
 
 			elif tok.name == '/':
 
-				self.curr_node.children.append([psnode(tok,self.curr_node)])
+				self.curr_node.children.append(psnode(tok,self.curr_node))
 
-				tok = items.next()
+				tok = self.tokens.next()
 
-				self.curr_node.children[-1].children.append([tok])
+				self.curr_node.children[-1].children.append(psnode(tok,self.curr_node))
 
 				self._find_nodes()
+
+			else:
+
+				self.curr_node.children.append(psnode(tok,self.curr_node))
 
 
 	def ps_to_tree(self):
