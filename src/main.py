@@ -2,18 +2,38 @@
 
 # main.py - Entry point for testing the library.
 
-import sys, pprint
+import sys
 import tokenizer, outputps
 
-def print_pstree(treeobj):
+def print_pstree(treeobj,c = None):
+
+	dots = ''
+
+	if c == None:
+		c = 0
+
+	else:
+		c += 1
+	
+	#print('//'+str(c)+'//')
+
+	a = 0
+
+	while a < c:
+
+		dots += ' .'	
+
+		a += 1
 
 	for i in treeobj.children:
 
-		print(i.token.name)
-		print_pstree(i)
+		print(dots+i.token.name)
+
+		print_pstree(i,c)
 
 def main():
 	tokens = tokenizer.Tokenizer(sys.stdin)
+
 	t = outputps.pstree(tokens)
 
 	psobj = t.ps_to_tree()

@@ -31,13 +31,19 @@ class pstree:
 
 	def _find_nodes(self):
 
-		tok = self.tokens.next()
+		child_of_last_node = False
 
 		for tok in self.tokens:
 
-			print(tok.name)		
+			#print(tok.name)
 
-			if tok.name in OOPS:
+			if child_of_last_node:
+
+				self.curr_node.children[-1].children.append(psnode(tok,self.curr_node.children[-1]))
+
+				child_of_last_node = False
+
+			elif tok.name in OOPS:
 
 				self.curr_node.children.append(psnode(tok,self.curr_node))
 
@@ -51,17 +57,11 @@ class pstree:
 
 				self.curr_node = self.curr_node.parent
 
-				self._find_nodes()
-
 			elif tok.name == '/':
 
 				self.curr_node.children.append(psnode(tok,self.curr_node))
 
-				tok = self.tokens.next()
-
-				self.curr_node.children[-1].children.append(psnode(tok,self.curr_node))
-
-				self._find_nodes()
+				child_of_last_node = True
 
 			else:
 
@@ -70,17 +70,7 @@ class pstree:
 
 	def ps_to_tree(self):
 
-		run = True
-
-		while run:
-
-			try:
-
-				self._find_nodes()
-
-			except StopIteration:
-
-				run = False
+		self._find_nodes()
 
 		while self.curr_node.parent: # get to the top of the tree
 
