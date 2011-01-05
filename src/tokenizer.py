@@ -43,8 +43,10 @@ class Token:
 				return False
 			raise Exception("Invalid character: " + character)
 
-		if ((self.data_type == "base85") and (character == "~")):
-			return False
+		if (self.data_type == "base85"):
+			if (character == "~"):
+				return False
+			return True
 
 		if (self.data_type == "operator"):
 			if (len(self.name) == 1):
@@ -54,6 +56,12 @@ class Token:
 					return True
 				if ((self.name == ">")
 						and (character == ">")):
+					return True
+				if ((self.name == "~")
+						and (character == ">")):
+					return True
+				if ((self.name == "/")
+						and (character == "/")):
 					return True
 			return False
 
@@ -99,11 +107,16 @@ class Tokenizer:
 		self.mode = "name"
 		while (character != ""):
 			if (not current_token.isValid(character)):
+				if (current_token.data_type == "base85"):
+					self.mode = "operator"
 				if ((len(current_token.name) > 0)
-						or (current_token.data_type == "string")
+						or ((current_token.data_type == "string")
+							or (current_token.data_type == "hex")
+							or (current_token.data_type == "base85"))
 						or ((self.last_token != None)
 							and (self.last_token.data_type == "operator")
-							and (self.last_token.name == "/"))):
+							and ((self.last_token.name == "/")
+								or (self.last_token.name == "//")))):
 					self.last_token = current_token
 					return current_token
 				if character == "%":
