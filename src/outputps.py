@@ -6,6 +6,8 @@ OOPS = ('[','{','(','<')
 
 EOPS = {'[':']','{':'}','(':')','<':'>'}
 
+EXTOPS = ('pdfmark')
+
 OPLABEL = 'operator'
 
 white_space = re.compile('\s')
@@ -31,17 +33,29 @@ class pstree:
 
 	def _find_nodes(self):
 
+		match_name = None
+
 		child_of_last_node = False
 
 		for tok in self.tokens:
 
 			#print(tok.name)
 
-			if child_of_last_node:
+			if child_of_last_node or match_name:
 
 				self.curr_node.children[-1].children.append(psnode(tok,self.curr_node.children[-1]))
 
 				child_of_last_node = False
+
+				if tok.name in EXTOPS:
+
+					print(tok.name,'matched EXTOPS')
+
+					match_name = tok.name
+
+				if match_name == tok.name:
+
+					match_name == None
 
 			elif tok.name in OOPS:
 
