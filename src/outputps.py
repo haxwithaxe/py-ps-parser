@@ -1,47 +1,89 @@
 #!/usr/bin/python
 
-OOPS = ('/','[','{','(','<')
+import re
+
+OOPS = ('[','{','(','<')
+
+EOPS = {']':'[','}':'{',')':'(','>':'<'}
 
 OPLABEL = 'operator'
 
+white_space = re.compile('\s')
+
 class node:
 
-	def __init__(self,token):
+	def __init__(self,token,parent = None):
 
 		self.children = []
 
-		self.token = token	
+		self.token = token # the token associated with this PS node
 
-def find_nodes(pos,items,tree):
+		self.parent = parent # pointer to the parent node
 
-	if items[pos].name in OOPS and items[pos].data_type == OPLABEL:
 
-		while not items[pos].data_type == OPLABEL:
+class tree:
 
-			pos += 1
+	def __init__(self, tokens):
 
-			curr_node.children.append([items[pos]])
+		self.curr_node = node(None)
 
-		if items[pos].name in OOPS:
+		self.tokens = tokens
 
-			
+	def _find_nodes(self):
 
-			
+		tok = self.tokens.next()
 
-	return pos, tree
+		if tok.name in OOPS and tok.data_type == OPLABEL:
 
-def outputps(input):
+			while tok.data_type != OPLABEL:
 
-	i = 0
+				self.curr_node.children[-1].append([tok])
 
-	while i < len(input):
+				tok = self.tokens.next()			
 
-		find_nodes(i,input)
-			
+			if tok.name in OOPS:
 
-		else:
+				self.curr_node.children.append([node(tok,self.curr_node)])
 
-			curr_node.children.append([input[i]])
+				self.curr_node = self.curr_node.children[-1]
 
-		i += 1
+				_find_nodes()
 
+			elif tok.name == EOPS[self.curr_node.token.name]:
+
+				self.curr_node.children[-1].append([tok])
+
+				self.curr_node = self.curr_node.parent
+
+				_find_nodes(items,curr_node)
+
+			elif tok.name == '/':
+
+				self.curr_node.children.append([node(tok,self.curr_node)])
+
+				tok = items.next()
+
+				self.curr_node.children[-1].children.append([tok])
+
+				_find_nodes()
+
+
+	def ps_to_tree(self):
+
+		run = True
+
+		while run:
+
+			try:
+
+				_find_nodes()
+
+			except StopIteration:
+
+				run = False
+
+		while self.curr_node.parent: # get to the top of the tree
+
+			self.curr_node = self.curr_node.parent
+
+		return self.curr_node

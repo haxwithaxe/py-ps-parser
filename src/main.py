@@ -7,7 +7,9 @@ import tokenizer, outputps
 
 def main():
 	tokens = tokenizer.tokenize(sys.stdin)
-	outputps.outputps(tokens)
+	t = outputps.tree(tokens)
+
+	print t.ps_to_tree()
 
 if __name__=="__main__":
 	main()
