@@ -10,7 +10,7 @@ OPLABEL = 'operator'
 
 white_space = re.compile('\s')
 
-class node:
+class psnode:
 
 	def __init__(self,token,parent = None):
 
@@ -21,11 +21,13 @@ class node:
 		self.parent = parent # pointer to the parent node
 
 
-class tree:
+class pstree:
 
 	def __init__(self, tokens):
 
-		self.curr_node = node(None)
+		self.curr_node = psnode(None)
+
+		type(self.curr_node)
 
 		self.tokens = tokens
 
@@ -43,11 +45,11 @@ class tree:
 
 			if tok.name in OOPS:
 
-				self.curr_node.children.append([node(tok,self.curr_node)])
+				self.curr_node.children.append([psnode(tok,self.curr_node)])
 
 				self.curr_node = self.curr_node.children[-1]
 
-				_find_nodes()
+				self._find_nodes()
 
 			elif tok.name == EOPS[self.curr_node.token.name]:
 
@@ -55,17 +57,17 @@ class tree:
 
 				self.curr_node = self.curr_node.parent
 
-				_find_nodes(items,curr_node)
+				self._find_nodes(items,curr_node)
 
 			elif tok.name == '/':
 
-				self.curr_node.children.append([node(tok,self.curr_node)])
+				self.curr_node.children.append([psnode(tok,self.curr_node)])
 
 				tok = items.next()
 
 				self.curr_node.children[-1].children.append([tok])
 
-				_find_nodes()
+				self._find_nodes()
 
 
 	def ps_to_tree(self):
@@ -76,7 +78,7 @@ class tree:
 
 			try:
 
-				_find_nodes()
+				self._find_nodes()
 
 			except StopIteration:
 

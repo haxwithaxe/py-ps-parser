@@ -3,15 +3,13 @@
 # main.py - Entry point for testing the library.
 
 import sys
-import tokenizer
+import tokenizer, outputps
 
 def main():
-	tokens = []
-	for token in tokenizer.Tokenizer(sys.stdin):
-		tokens.append(token)
-		print "Token:" + token.data_type + ": >" + token.name + "<"
-	print ""
-	print "Number of tokens:", len(tokens)
+	tokens = tokenizer.Tokenizer(sys.stdin)
+	t = outputps.pstree(tokens)
+
+	print t.ps_to_tree()
 
 if __name__=="__main__":
 	main()
