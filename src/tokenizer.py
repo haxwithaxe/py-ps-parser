@@ -23,16 +23,22 @@ class Tokenizer:
 	def __iter__(self):
 		return self
 
-	def nextChar(self):
+	def _nextChar(self):
 		self.last_char = self.instream.read(1)
 		return self.last_char
+
+	def _nextLine(self):
+		line = self._nextChar()
+		while (not (self.last_char in NEWLINE)):
+			line += self._nextChar()
+		return line
 
 	def nextType1(self):
 		self.mode = "name"
 		current_token = token.Token(data_type="type1")
 		count = 0
 		while (count < 8):
-			line = self.instream.readline()
+			line = self._nextLine()
 			if (line == ""):
 				raise StopIteration
 			current_token.append(line)
@@ -62,9 +68,9 @@ class Tokenizer:
 		current_token = token.Token(data_type=self.mode)
 		if (self.mode == "operator"):
 			current_token.append(self.last_char)
-			character = self.nextChar()
+			character = self._nextChar()
 		if (self.last_char == ""):
-			character = self.nextChar()
+			character = self._nextChar()
 		else:
 			character = self.last_char
 		self.mode = "name"
@@ -86,16 +92,16 @@ class Tokenizer:
 					current_token.data_type = "comment"
 					while ((character != "") and not (character in NEWLINE)):
 						current_token.append(character)
-						character = self.nextChar()
+						character = self._nextChar()
 					return current_token
 				if (character in SPECIAL_CHARACTERS):
 					self.mode = "operator"
 					break
-				character = self.nextChar()
+				character = self._nextChar()
 				break
 			else:
 				current_token.append(character)
-			character = self.nextChar()
+			character = self._nextChar()
 		if (character == ""):
 			self.mode = "EOF"
 		if (len(current_token.name) > 0):
