@@ -29,7 +29,7 @@ class Tokenizer:
 
 	def nextType1(self):
 		self.mode = "name"
-		current_token = Token(data_type="type1")
+		current_token = token.Token(data_type="type1")
 		count = 0
 		while (count < 8):
 			line = self.instream.readline()
@@ -59,7 +59,7 @@ class Tokenizer:
 				self.mode = "base85"
 			else:
 				self.mode = "name"
-		current_token = Token(data_type=self.mode)
+		current_token = token.Token(data_type=self.mode)
 		if (self.mode == "operator"):
 			current_token.append(self.last_char)
 			character = self.nextChar()
