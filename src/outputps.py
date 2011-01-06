@@ -39,37 +39,88 @@ class pstree:
 
 		for tok in self.tokens:
 
-			#print(tok.name)
+			print(tok.name)
 
-			if child_of_last_node or match_name:
+			if match_name == tok.name:
 
-				self.curr_node.children[-1].children.append(psnode(tok,self.curr_node.children[-1]))
+				print(tok.name, 'matched previous operator')
 
-				child_of_last_node = False
-
-				if tok.name in EXTOPS:
-
-					print(tok.name,'matched EXTOPS')
-
-					match_name = tok.name
-
-				if match_name == tok.name:
-
-					match_name == None
-
-			elif tok.name in OOPS:
+				match_name == None
 
 				self.curr_node.children.append(psnode(tok,self.curr_node))
+
+				print('one up')
+
+				self.curr_node = self.curr_node.parent
+
+			elif tok.name in EXTOPS:
+
+				print(tok.name,'matched EXTOPS')
+
+				match_name = tok.name
+
+				self.curr_node.children.append(psnode(tok,self.curr_node))
+
+				print('one down')
 
 				self.curr_node = self.curr_node.children[-1]
 
-				self._find_nodes()
+			elif child_of_last_node:
 
-			elif self.curr_node.token and tok.name == EOPS[self.curr_node.token.name]:
+				try:
+
+					self.curr_node.children[-1].children.append(psnode(tok,self.curr_node.children[-1]))
+
+				except IndexError:
+
+					self.curr_node.children.append(psnode(tok,self.curr_node))
+
+				child_of_last_node = False
+
+			elif tok.name in OOPS:
+
+				match = True
+
+				if tok.name == '[':
+
+					tmp = self.curr_node
+
+					while tmp:
+
+						tmp = tmp.parent
+
+						if tmp == None:
+
+							break
+
+						elif tmp.token == None:
+
+							break
+
+						elif tmp.token.name in EXTOPS:
+
+							print('stay here')
+
+							match = False
+
+							break
 
 				self.curr_node.children.append(psnode(tok,self.curr_node))
 
+				if match:
+
+					print('one down')
+
+					self.curr_node = self.curr_node.children[-1]
+
+			elif self.curr_node.token and self.curr_node.token.name in OOPS and tok.name == EOPS[self.curr_node.token.name]:
+
+				self.curr_node.children.append(psnode(tok,self.curr_node))
+
+				print('one up')
+
 				self.curr_node = self.curr_node.parent
+
 
 			elif tok.name == '/':
 
@@ -81,6 +132,35 @@ class pstree:
 
 				self.curr_node.children.append(psnode(tok,self.curr_node))
 
+	def strip_font_data(self):
+
+		drop = False
+
+		for tok in self.tokens:
+
+			if tok.name == 'eexec':
+
+				self.tokens.binary = True
+
+			elif tok.name == 'cleartomark'
+
+				self.tokens.binary = False
+
+				drop = False
+
+			elif tok.name == '%!PS-AdobeFont-1.0':
+
+				drop = True
+
+			if not drop:
+
+				output.append(tok.name)
+
+				
+
+		output = ''.join(for x in output)
+
+		return output
 
 	def ps_to_tree(self):
 
