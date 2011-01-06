@@ -3,69 +3,14 @@
 # tokenizer.py - Functions for tokenizing the input stream.
 
 import string
+import token
 
 SPECIAL_CHARACTERS = "()<>[]{}/%"
 BLOCK_START = "(<[{"
 WHITE_SPACE = "\x00\t\x0a\x0c\x0d "
 NEWLINE = "\x0a\x0c\x0d"
 HEX = "0123456789abcdefABCDEF"
-
-class Token:
-	def __init__(self, name = "", data_type = "name"):
-		self.name = name
-		self.data_type = data_type
-		self.depth = 0
-
-	def append(self, character):
-		self.name += character
-
-	def isValid(self, character):
-		if (self.data_type == "string"):
-			if (character == "("):
-				if (self.name[-1:] == "\\"):
-					return True
-				else:
-					self.depth += 1
-					return True
-			if (character == ")"):
-				if (self.name[-1:] == "\\"):
-					return True
-				if self.depth:
-					self.depth -= 1
-					return True
-				return False
-			return True
-
-		if (self.data_type == "hex"):
-			if (character in (WHITE_SPACE + HEX)):
-				return True
-			if (character == ">"):
-				return False
-			raise Exception("Invalid character: " + character)
-
-		if (self.data_type == "base85"):
-			if (character == "~"):
-				return False
-			return True
-
-		if (self.data_type == "operator"):
-			if (len(self.name) == 1):
-				if ((self.name == "<")
-						and ((character == "<")
-							or (character == "~"))):
-					return True
-				if ((self.name == ">")
-						and (character == ">")):
-					return True
-				if ((self.name == "~")
-						and (character == ">")):
-					return True
-				if ((self.name == "/")
-						and (character == "/")):
-					return True
-			return False
-
-		return not (character in (WHITE_SPACE + SPECIAL_CHARACTERS))
+ZERO_PAD = "0000000000000000000000000000000000000000000000000000000000000000"
 
 class Tokenizer:
 	def __init__(self, instream):
@@ -82,7 +27,25 @@ class Tokenizer:
 		self.last_char = self.instream.read(1)
 		return self.last_char
 
+	def nextType1(self):
+		self.mode = "name"
+		current_token = Token(data_type="type1")
+		count = 0
+		while (count < 8):
+			line = self.instream.readline()
+			if (line == ""):
+				raise StopIteration
+			current_token.append(line)
+			if (ZERO_PAD in line):
+				count += 1
+			elif (count):
+				count = 0
+		self.last_char = line[-1]
+		return current_token
+
 	def next(self):
+		if (self.mode == "type1"):
+			return self.nextType1()
 		if (self.mode == "EOF"):
 			raise StopIteration
 		if ((self.last_token != None)
