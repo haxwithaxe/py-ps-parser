@@ -1,6 +1,12 @@
 #!/usr/bin/python
 
 # token.py - Token class. Represents an element of the tokenized PostScript stream.
+SPECIAL_CHARACTERS = "()<>[]{}/%"
+BLOCK_START = "(<[{"
+WHITE_SPACE = "\x00\t\x0a\x0c\x0d "
+NEWLINE = "\x0a\x0c\x0d"
+HEX = "0123456789abcdefABCDEF"
+ZERO_PAD = "0000000000000000000000000000000000000000000000000000000000000000"
 
 class Token:
 	def __init__(self, name = "", data_type = "name"):

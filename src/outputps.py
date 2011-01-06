@@ -134,31 +134,97 @@ class pstree:
 
 	def strip_font_data(self):
 
+		output = []
+
+		skip = False
+
 		drop = False
+
+		token_buff = ''
+
+		dict_count = 0
+
+		watch_image = False
+
+		last_name_type = None
+
+		namebuff = ''
+
+		font_renamere_type = re.compile("Type[0-9]_AH[0-9]{4}")
 
 		for tok in self.tokens:
 
-			if tok.name == 'eexec':
+			if skip:
 
-				self.tokens.binary = True
+				namebuff += tok.name
 
-			elif tok.name == 'cleartomark'
+				if namebuff == '{restore}if':
 
-				self.tokens.binary = False
+					skip = False
 
-				drop = False
+					namebuff = ''
 
-			elif tok.name == '%!PS-AdobeFont-1.0':
+					drop = False
 
-				drop = True
+			else:
 
-			if not drop:
+				if tok.name == 'eexec':
 
-				output.append(tok.name)
+					self.tokens.nextType1()
 
-				
+				elif tok.name == 'cleartomark':
 
-		output = ''.join(for x in output)
+					skip = True
+
+				elif tok.name == '%!PS-AdobeFont-1.0':
+
+					drop = True
+
+				elif tok.name == 'def' and drop:
+
+					dict_count += 1
+
+				elif tok.name == 'end' and drop:
+
+					dict_count -= 1
+
+					if dict_count == 0:
+
+						oputput.append(token_buff)
+
+						token_buff = ''
+
+						drop = False
+
+				if watch_image:
+
+					token_buff += ' '+tok.name
+
+				if watch_image and tok.name == 'CIDFontType':
+
+					token_buff = ''
+
+					drop = True
+
+				if last_name_type == 'number' and tok.name == 'dict':
+
+					watch_image = True
+
+					drop = True
+
+				if tok.name.isdigit() and tok.data_type == 'name':
+
+					last_name_type = 'number'
+
+				else:
+
+					last_name_type = None
+
+				if not drop:
+
+					output.append(tok.name)				
+
+		output = ''.join(' '+str(x) for x in output)
 
 		return output
 

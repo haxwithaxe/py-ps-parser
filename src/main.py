@@ -36,9 +36,9 @@ def main():
 
 	t = outputps.pstree(tokens)
 
-	psobj = t.ps_to_tree()
+	psobj = t.strip_font_data()
 
-	print_pstree(psobj)
+	print(psobj)
 
 if __name__=="__main__":
 	main()
