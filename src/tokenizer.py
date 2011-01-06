@@ -28,10 +28,13 @@ class Tokenizer:
 		return self.last_char
 
 	def nextType1(self):
+		self.mode = "name"
 		current_token = Token(data_type="type1")
 		count = 0
 		while (count < 8):
 			line = self.instream.readline()
+			if (line == ""):
+				raise StopIteration
 			current_token.append(line)
 			if (ZERO_PAD in line):
 				count += 1
@@ -41,6 +44,8 @@ class Tokenizer:
 		return current_token
 
 	def next(self):
+		if (self.mode == "type1"):
+			return self.nextType1()
 		if (self.mode == "EOF"):
 			raise StopIteration
 		if ((self.last_token != None)
