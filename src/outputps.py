@@ -138,6 +138,10 @@ class pstree:
 
 		checknext = False
 
+		dropnextif = False
+
+		poplast = False
+
 		drop = False
 
 		font_rename_type = re.compile("Type[0-9]_AH[0-9]{4}")
@@ -166,17 +170,35 @@ class pstree:
 
 				trash = self.tokens.mode = "type1"
 
-			if tok.name == 'cleartomark':
-
-				drop = False
-
 			if font_rename_type.match(tok.name):
 
 				checknext = True
 
-			if not drop:
+			if tok.name == 'cleartomark':
 
-				output.append(tok.name)
+				drop == True
+
+				poplast = True
+
+			if poplast:
+
+				output.pop(-1)
+
+				poplast = False
+
+			if not drop or ( tok.name == 'if' and dropnextif ):
+
+					output.append(tok.name)
+
+			if dropnextif and tok.name == 'if':
+
+				dropnextif = False
+
+			if tok.name == 'cleartomark':
+
+				drop = False
+
+				dropnextif = True
 
 		soutput = ''
 	
