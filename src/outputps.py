@@ -146,6 +146,10 @@ class pstree:
 
 		for tok in self.tokens:
 
+			if tok.name == 'eexec':
+
+				self.tokens.mode = 'type1'
+
 			if tok.name == dropuntil:
 
 				drop = False
