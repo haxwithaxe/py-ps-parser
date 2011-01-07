@@ -144,61 +144,83 @@ class pstree:
 
 		drop = False
 
+		dropuntil = None
+
 		font_rename_type = re.compile("Type[0-9]_AH[0-9]{4}")
 
 		font_rename_fu = re.compile("CMap_AH[0-9]{4}-[\S]")
 
 		for tok in self.tokens:
 
-			trash = None
-
-			if checknext and ( font_rename_fu.match(tok.name) or tok.name == '/' ):
-
-				if tok.name != '/':
-
-					output.pop(-1)
-
-					output.pop(-1)
-
-					drop = True
-
-			if tok.name.startswith('%!PS-AdobeFont-1.0'):
-
-				drop = True
-
-			if tok.name == 'eexec':
-
-				trash = self.tokens.mode = "type1"
-
-			if font_rename_type.match(tok.name):
-
-				checknext = True
-
-			if tok.name == 'cleartomark':
-
-				drop == True
-
-				poplast = True
-
-			if poplast:
-
-				output.pop(-1)
-
-				poplast = False
-
-			if not drop or ( tok.name == 'if' and dropnextif ):
-
-					output.append(tok.name)
-
-			if dropnextif and tok.name == 'if':
-
-				dropnextif = False
-
-			if tok.name == 'cleartomark':
+			if tok.name == dropuntil:
 
 				drop = False
 
-				dropnextif = True
+				dropuntil = None
+
+			#if checknext and ( font_rename_fu.match(tok.name) or tok.name == '/' ):
+
+			#	if tok.name != '/':
+
+			#		output.pop(-1)
+
+			#		output.pop(-1)
+
+			#		drop = True
+
+			#if tok.name.startswith('%!PS-AdobeFont'):
+
+			#	drop = True
+
+			if tok.name == 'eexec':
+
+				self.tokens.mode = "type1"
+
+			#if font_rename_type.match(tok.name):
+
+			#	checknext = True
+
+			#if tok.name == 'cleartomark':
+
+			#	drop == True
+
+			#	checknext = True
+
+			#	if output[-1] == '/':
+
+			#		poplast = True
+
+			#if poplast:
+
+			#	output.pop(-1)
+
+			#	poplast = False
+
+			if not drop:
+
+				#if tok.name == 'if' and dropnextif:
+
+				#	pass
+
+				#else:
+
+				output.append(tok.name)
+
+			if tok.name == '%%EndComments':
+
+				drop = True
+
+				dropuntil = '%%Page: 1 1'
+
+			#if dropnextif and tok.name == 'if':
+
+			#	dropnextif = False
+
+			#if tok.name == 'cleartomark':
+
+			#	drop = False
+
+			#	dropnextif = True
 
 		soutput = ''
 	
