@@ -109,3 +109,6 @@ class Tokenizer:
 			return current_token
 		return self.next()
 
+	def __next__(self):
+		return self.next()
+
