@@ -136,97 +136,61 @@ class pstree:
 
 		output = []
 
-		skip = False
+		checknext = False
 
 		drop = False
 
-		token_buff = ''
+		font_rename_type = re.compile("Type[0-9]_AH[0-9]{4}")
 
-		dict_count = 0
-
-		watch_image = False
-
-		last_name_type = None
-
-		namebuff = ''
-
-		font_renamere_type = re.compile("Type[0-9]_AH[0-9]{4}")
+		font_rename_fu = re.compile("CMap_AH[0-9]{4}-[\S]")
 
 		for tok in self.tokens:
 
-			if skip:
+			trash = None
 
-				namebuff += tok.name
+			if checknext and ( font_rename_fu.match(tok.name) or tok.name == '/' ):
 
-				if namebuff == '{restore}if':
+				if tok.name != '/':
 
-					skip = False
+					output.pop(-1)
 
-					namebuff = ''
+					output.pop(-1)
 
-					drop = False
+					drop = True
+
+			if tok.name.startswith('%!PS-AdobeFont-1.0'):
+
+				drop = True
+
+			if tok.name == 'eexec':
+
+				trash = self.tokens.mode = "type1"
+
+			if tok.name == 'cleartomark':
+
+				drop = False
+
+			if font_rename_type.match(tok.name):
+
+				checknext = True
+
+			if not drop:
+
+				output.append(tok.name)
+
+		soutput = ''
+	
+		for x in output:
+
+			if str(x) == '/':
+
+				soutput += str(x)
 
 			else:
 
-				if tok.name == 'eexec':
+				soutput += str(x)+'\n'
 
-					self.tokens.nextType1()
-
-				elif tok.name == 'cleartomark':
-
-					skip = True
-
-				elif tok.name == '%!PS-AdobeFont-1.0':
-
-					drop = True
-
-				elif tok.name == 'def' and drop:
-
-					dict_count += 1
-
-				elif tok.name == 'end' and drop:
-
-					dict_count -= 1
-
-					if dict_count == 0:
-
-						oputput.append(token_buff)
-
-						token_buff = ''
-
-						drop = False
-
-				if watch_image:
-
-					token_buff += ' '+tok.name
-
-				if watch_image and tok.name == 'CIDFontType':
-
-					token_buff = ''
-
-					drop = True
-
-				if last_name_type == 'number' and tok.name == 'dict':
-
-					watch_image = True
-
-					drop = True
-
-				if tok.name.isdigit() and tok.data_type == 'name':
-
-					last_name_type = 'number'
-
-				else:
-
-					last_name_type = None
-
-				if not drop:
-
-					output.append(tok.name)				
-
-		output = ''.join(' '+str(x) for x in output)
-
-		return output
+		return soutput
 
 	def ps_to_tree(self):
 
