@@ -1,6 +1,22 @@
 #!/usr/bin/python
 
+import sys
+
+def debug(output,newline = True):
+
+	if DEBUG:
+
+		if newline:
+
+			sys.stderr.write(output+'\n')
+
+		else:
+
+			sys.stderr.write(output)
+
 import re
+
+DEBUG = True
 
 OOPS = ('[','{','(','<')
 
@@ -12,9 +28,11 @@ OPLABEL = 'operator'
 
 white_space = re.compile('\s')
 
-font_rename_type = re.compile("Type[0-9]_AH[0-9]{4}")
+font_type1_begin = re.compile("%!PS-AdobeFont-[0-9]+.[0-9]+[^\n\r]*")
 
-font_rename_fu = re.compile("CMap_AH[0-9]{4}-[\S]")
+font_rename_alias = re.compile("Type[0-9]_AH[0-9]{4}")
+
+font_rename_name = re.compile("AH[0-9]{4}-[\S]")
 
 class psnode:
 
@@ -140,34 +158,133 @@ class pstree:
 
 		output = []
 
+		soutput = ''
+
+		t2fonts = {}
+
 		drop = False
 
 		dropuntil = None
 
+		dropnext = False
+
+		dropthis = False
+
+		font = None
+
+		checknextname = False
+
 		for tok in self.tokens:
 
+			debug(tok.name)
+
+			# check to see if we're gonna be getting binary data and tell the tokenizer that it needs to be ready
 			if tok.name == 'eexec':
 
 				self.tokens.mode = 'type1'
 
+			# predrop/append changes
+
+			if checknextname and tok.data_type == 'name':
+
+				debug('>>>>>>>>>>>>>>>>>>>>>>>>>>>> checknextname == '+str(checknextname))
+
+				if font_rename_name.match(tok.name):
+
+					debug('>>>>>>>>>>>>>>>>>>>>>>>> found font '+tok.name)
+
+					font = re.sub("AH[0-9]{4}-","",tok.name)
+
+				if tok.name == 'if':
+
+					debug('>>>>>>>>>>>>>>>>>>>>>>>>>>>> found if after cleartomark')
+
+					dropthis = True					
+
+				if checknextname <= 0:
+
+					checknextname = False
+
+				else:
+
+					checknextname -= 1
+
+			if tok.name == 'CIDFontName':
+
+				checknextname = 2
+
+			if font_rename_alias.match(tok.name) and font:
+
+				t2fonts[tok.name] = font
+
+				font = False
+
+			if font_rename_alias.match(tok.name) and not font:
+
+				debug('>>>>>>>>>>>>>>>>>>>>>>>>>> found font alias'+tok.name+' == '+t2fonts[tok.name])
+
+				tok.name = t2fonts[tok.name]
+
+			if tok.name == 'CIDFontType':
+
+				output.pop(-1)
+
+				output.pop(-1)
+
+				output.pop(-1)
+
+				output.pop(-1)
+
+				drop = True
+
+				dropuntil = 'composefont'
+
+			if font_type1_begin.match(tok.name):
+
+				drop = True
+
+				dropuntil = 'cleartomark'
+
+			# drop and set/reset mode variables
+
+			if not drop and not dropnext and not dropthis:
+
+				output.append(tok.name)
+
+			else:
+
+				debug('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> DROPPED!!!',False)
+
+			if dropnext:
+
+				debug('dropnext')
+
+				dropnext == False
+
+			if dropthis:
+
+				debug('dropthis')
+
+				dropthis = False
+
 			if tok.name == dropuntil:
+
+				debug('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> KEEP AFTER THIS')
 
 				drop = False
 
 				dropuntil = None
 
-			if not drop:
+			# post drop/apend changes
 
-				output.append(tok.name)
+			if tok.name == 'cleartomark':
 
-			if tok.name == '%%EndComments':
+				checknextname = 2
 
-				drop = True
+			if tok.name == 'composefont':
 
-				dropuntil = '%%Page: 1 1'
+				dropnext = True
 
-		soutput = ''
-	
 		for x in output:
 
 			if str(x) == '/':
