@@ -11,6 +11,7 @@ WHITE_SPACE = "\x00\t\x0a\x0c\x0d "
 NEWLINE = "\x0a\x0c\x0d"
 HEX = "0123456789abcdefABCDEF"
 ZERO_PAD = "0000000000000000000000000000000000000000000000000000000000000000"
+SHORT_ZERO_PAD = "00000000000000000000000000000000"
 
 class Tokenizer:
 	def __init__(self, instream):
@@ -37,15 +38,19 @@ class Tokenizer:
 		self.mode = "name"
 		current_token = token.Token(data_type="type1")
 		count = 0
-		while (count < 8):
+		short_count = 0
+		while ((count < 8) and (short_count < 16)):
 			line = self._nextLine()
 			if (line == ""):
 				raise StopIteration
 			current_token.append(line)
 			if (ZERO_PAD in line):
 				count += 1
+			elif (SHORT_ZERO_PAD in line):
+				short_count += 1
 			elif (count):
 				count = 0
+				short_count = 0
 		self.last_char = line[-1]
 		return current_token
 
