@@ -1,22 +1,6 @@
 #!/usr/bin/python
 
-import sys
-
-def debug(output,newline = True):
-
-	if DEBUG:
-
-		if newline:
-
-			sys.stderr.write(output+'\n')
-
-		else:
-
-			sys.stderr.write(output)
-
 import re
-
-DEBUG = True
 
 OOPS = ('[','{','(','<')
 
@@ -176,8 +160,6 @@ class pstree:
 
 		for tok in self.tokens:
 
-			debug(tok.name)
-
 			# check to see if we're gonna be getting binary data and tell the tokenizer that it needs to be ready
 			if tok.name == 'eexec':
 
@@ -187,17 +169,12 @@ class pstree:
 
 			if checknextname and tok.data_type == 'name':
 
-				debug('>>>>>>>>>>>>>>>>>>>>>>>>>>>> checknextname == '+str(checknextname))
 
 				if font_rename_name.match(tok.name):
-
-					debug('>>>>>>>>>>>>>>>>>>>>>>>> found font '+tok.name)
 
 					font = re.sub("AH[0-9]{4}-","",tok.name)
 
 				if tok.name == 'if':
-
-					debug('>>>>>>>>>>>>>>>>>>>>>>>>>>>> found if after cleartomark')
 
 					dropthis = True					
 
@@ -211,7 +188,7 @@ class pstree:
 
 			if tok.name == 'CIDFontName':
 
-				checknextname = 2
+				checknextname = 1
 
 			if font_rename_alias.match(tok.name) and font:
 
@@ -220,8 +197,6 @@ class pstree:
 				font = False
 
 			if font_rename_alias.match(tok.name) and not font:
-
-				debug('>>>>>>>>>>>>>>>>>>>>>>>>>> found font alias'+tok.name+' == '+t2fonts[tok.name])
 
 				tok.name = t2fonts[tok.name]
 
@@ -251,25 +226,15 @@ class pstree:
 
 				output.append(tok.name)
 
-			else:
-
-				debug('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> DROPPED!!!',False)
-
 			if dropnext:
 
-				debug('dropnext')
-
-				dropnext == False
+				dropnext = False
 
 			if dropthis:
-
-				debug('dropthis')
 
 				dropthis = False
 
 			if tok.name == dropuntil:
-
-				debug('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> KEEP AFTER THIS')
 
 				drop = False
 
