@@ -6,6 +6,8 @@ OOPS = ('[','{','(','<')
 
 EOPS = {'[':']','{':'}','(':')','<':'>'}
 
+AOPS = ('/','[',']','{','}','(',')','<','>')
+
 EXTOPS = ('pdfmark')
 
 OPLABEL = 'operator'
@@ -242,19 +244,21 @@ class pstree:
 
 				dropuntil = None
 
+				if tok.name == 'cleartomark':
+
+					checknextname = 2
+
+
 			# post drop/apend changes
 
-			if tok.name == 'cleartomark':
-
-				checknextname = 2
-
+		
 			if tok.name == 'composefont':
 
 				dropnext = True
 
 		for x in output:
 
-			if str(x) == '/':
+			if str(x) in ('/'):
 
 				soutput += str(x)
 
