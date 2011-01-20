@@ -12,6 +12,8 @@ OPLABEL = 'operator'
 
 white_space = re.compile('\s')
 
+eps_begin = re.compile('%!PS-Adobe-[0-9]*.[0-9]* EPSF-[0-9]*.[0-9]*.*')
+
 font_type1_begin = re.compile("%!PS-AdobeFont-[0-9]+.[0-9]+[^\n\r]*")
 
 font_rename_alias = re.compile("Type[0-9]_AH[0-9]{4}")
