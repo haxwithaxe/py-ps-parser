@@ -256,11 +256,34 @@ class pstree:
 
 				dropnext = True
 
+		nonewlines = 0
+
 		for x in output:
 
 			if str(x) in ('/'):
 
 				soutput += str(x)
+
+			elif str(x) == '(':
+
+				soutput += str(x)
+
+				nonewlines += 1
+
+			elif nonewlines > 0 and str(x) != ')':
+
+				soutput += str(x)+' '
+
+			elif str(x) == ')':
+
+				if soutput[-1] == ' ':
+
+					soutput = soutput[:-1]+str(x)+' '
+				else:
+
+					soutput += str(x)+' '
+
+				nonewlines -= 1
 
 			else:
 
