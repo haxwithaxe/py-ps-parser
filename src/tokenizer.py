@@ -96,8 +96,10 @@ class Tokenizer:
 					return current_token
 				if character == "%":
 					current_token.data_type = "comment"
-					while ((character != "") and not (character in NEWLINE)):
+					while (character != ""): # and not (character in NEWLINE)):
 						current_token.append(character)
+						if character in NEWLINE:
+							return current_token
 						character = self._nextChar()
 					return current_token
 				if (character in SPECIAL_CHARACTERS):

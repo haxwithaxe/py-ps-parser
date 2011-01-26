@@ -293,7 +293,7 @@ class pstree:
 
 			else:
 
-				soutput += str(x)+'\n'
+				soutput += str(x)+' '
 
 		return soutput
 
