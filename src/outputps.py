@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import re
+import re, sys
 
 OOPS = ('[','{','(','<')
 
@@ -202,7 +202,13 @@ class pstree:
 
 			if font_rename_alias.match(tok.name) and not font:
 
-				tok.name = t2fonts[tok.name]
+				try:
+
+					tok.name = t2fonts[tok.name]
+
+				except KeyError, e:
+
+					sys.stderr.write('Warning: '+tok.name+' was not replaced. Please manually replace it if the output is not correct\n')
 
 			if tok.name == 'CIDFontType':
 

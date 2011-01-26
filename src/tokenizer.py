@@ -2,9 +2,10 @@
 
 # tokenizer.py - Functions for tokenizing the input stream.
 
-import string
+import string, sys
 import token
 
+sys.setrecursionlimit(200000)
 SPECIAL_CHARACTERS = "()<>[]{}/%"
 BLOCK_START = "(<[{"
 WHITE_SPACE = "\x00\t\x0a\x0c\x0d "
