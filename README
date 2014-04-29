@@ -1,2 +1,2 @@
-This is a Python library for parsing ASCII encoded PostScript files.
+This is a Python library for parsing ASCII encoded PostScript files ... kinda. Turns out you need to interpret the PS to parse it so this doesn't do a good job but it was good enough to do what we wanted.
 
